@@ -1,0 +1,5 @@
+apiKey.secret
+location.secret
+*.secret
+plot.png
+__pycache__
