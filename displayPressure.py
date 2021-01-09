@@ -6,6 +6,9 @@ import datetime
 NUM_OF_HOURS = 48
 NUM_OF_READINGS = NUM_OF_HOURS * 2
 
+global HEIGHT
+HEIGHT = 191
+
 def main(NUM_OF_HOURS):
     f = open("pressure.csv")
     text = f.read()
@@ -20,11 +23,16 @@ def main(NUM_OF_HOURS):
     ax1 = fig.add_subplot(111, label="pressure")
     ax2 = fig.add_subplot(111, label="trend", frame_on=False)
 
+
     y = [float(val) for val in data[-NUM_OF_READINGS::,1]]
+
+    seaPressure = [
+                convertToSeaLevel(float(p), float(t), HEIGHT) for [p, t] in data[-NUM_OF_READINGS::, 1:3]
+            ]
     x = [int(val) for val in data[-NUM_OF_READINGS::,0]]
 
-
-    ax1.plot(x, y, "k-", label="pressure", color="C0")
+    ax1.plot(x, seaPressure, "k-", label="sea level pressure", color="C0")
+    ax1.plot(x, y, "-", label="absolute pressure", color="C1", alpha=0.4)
     ax1.set_xlabel("Time", color="C0")
     ax1.set_ylabel("Pressure", color="C0")
     ax1.tick_params(axis="x", colors="C0")
@@ -32,7 +40,10 @@ def main(NUM_OF_HOURS):
     ax1.legend(loc="upper left")
     # ax1.set_ylim([980, 1040])
 
-    trend = np.gradient(y)
+    try:
+        trend = np.gradient(y)
+    except ValueError:
+        trend = np.zeros((len(x)))
 
     flat = np.array(x) * 0
     ax2.plot(x, trend, label="trend", color="skyblue", alpha=0.4)
