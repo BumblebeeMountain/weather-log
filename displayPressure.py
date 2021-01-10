@@ -1,46 +1,60 @@
 #!/usr/bin/python3
 
 import matplotlib.pyplot as plt
+import databaseController as db
 import numpy as np
 import math
 import datetime
+import time
 
 NUM_OF_HOURS = 48
-NUM_OF_READINGS = NUM_OF_HOURS * 2
+
+TIME_AGO = NUM_OF_HOURS * 60 * 60
+MIN_TIME = int(time.time()) - TIME_AGO
 
 global HEIGHT
 HEIGHT = 191
 
-def main(NUM_OF_HOURS):
-    f = open("pressure.csv")
-    text = f.read()
-    text = text.split("\n")
-    text.pop()
-    text.pop(0)
-    text = [reading.split(", ") for reading in text ]
+def getData(MIN_TIME=0):
+    s = db.getDbSecrets()
 
-    data = np.array(text)
+    CMD = """
+        SELECT * FROM measure WHERE time >= {};
+    """.format(MIN_TIME)
+    host = s["hostname"]
+    user = s["username"]
+    passwd = s["password"]
+    dbname = s["dbname"]
+
+    con = db.createConnection(host, user, dbname, passwd)
+    data = db.executeQuery(con, CMD)
+    con.close()
+
+    return np.array(data)
+
+def main(MIN_TIME):
+
+    data = getData(MIN_TIME)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, label="pressure")
     ax2 = fig.add_subplot(111, label="trend", frame_on=False)
 
-
-    y = [float(val) for val in data[-NUM_OF_READINGS::,1]]
-
+    y = data[:, 1]
     seaPressure = [
-                convertToSeaLevel(float(p), float(t), HEIGHT) for [p, t] in data[-NUM_OF_READINGS::, 1:3]
+                convertToSeaLevel(float(p), float(t), HEIGHT) for [p, t] in data[:, 1:3]
             ]
-    x = [int(val) for val in data[-NUM_OF_READINGS::,0]]
+
+    x = data[:, 0]
 
     ax1.plot(x, seaPressure, "k-", label="sea level pressure", color="C0")
-    ax1.plot(x, y, "-", label="absolute pressure", color="C1", alpha=0.4)
+    # ax1.plot(x, y, "-", label="absolute pressure", color="C1", alpha=0.4)
     ax1.set_xlabel("Time", color="C0")
     ax1.set_ylabel("Pressure", color="C0")
     ax1.tick_params(axis="x", colors="C0")
     ax1.tick_params(axis="y", colors="C0")
     ax1.legend(loc="upper left")
-    # ax1.set_ylim([980, 1040])
+    ax1.set_ylim([980, 1040])
 
     try:
         trend = np.gradient(y)
@@ -73,4 +87,4 @@ def convertToSeaLevel(p, t, h):
     return p*math.pow((1-(0.0065*h/(t+0.0065*h+273.15))), -5.257)
 
 if __name__ == '__main__':
-    main(NUM_OF_HOURS)
+    main(MIN_TIME)

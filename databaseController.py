@@ -47,3 +47,21 @@ def executeQuery(connection, q):
         return result
     except Error as e:
         raise e
+
+def getDbSecrets(fileName="db.secret"):
+    try:
+        secrets = {}
+        f = open(fileName)
+        text = f.read()
+        f.close()
+
+        text = text.split("\n")
+        text.pop()
+
+        for line in text:
+            (key, value) = line.split(": ")
+            secrets[key] = value
+        return secrets
+
+    except Exception as e:
+        raise e
