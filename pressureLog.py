@@ -43,7 +43,15 @@ def main():
         loc = wth.getLocation("/home/pi/weather-log/secrets/location.secret")
         dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db-pi.secret")
 
-        con = db.createConnection(dbSecrets["hostname"], dbSecrets["username"], dbSecrets["dbname"], dbSecrets["password"]) # createConnection(hostName, userName, dbName, password):
+        host = dbSecrets["hostname"]
+        user = dbSecrets["username"]
+        passwd = dbSecrets["password"]
+        dbname = dbSecrets["dbname"]
+        ca = dbSecrets["ca"]
+        cert = dbSecrets["cert"]
+        key = dbSecrets["key"]
+
+        con = db.createConnectionSSL(host, dbname, user, passwd, ca, cert, key)
 
         takeRecord(apiKey, loc, con)
 
