@@ -37,10 +37,12 @@ def takeRecord(apiKey, loc, con):
     db.executeUpdate(con, cmd)
 
 def main():
+    con = None
     try:
         apiKey = wth.getApiKey("/home/pi/weather-log/secrets/apiKey.secret")
         loc = wth.getLocation("/home/pi/weather-log/secrets/location.secret")
         dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db.secret")
+
         con = db.createConnection(dbSecrets["hostname"], dbSecrets["username"], dbSecrets["dbname"], dbSecrets["password"]) # createConnection(hostName, userName, dbName, password):
 
         takeRecord(apiKey, loc, con)
@@ -48,6 +50,10 @@ def main():
     except Exception as e:
         print("something went wrong:\n{}".format(e))
         sense.clear()
+
+    finally:
+        if con is not None:
+            con.close()
 
 if __name__ == '__main__':
     main()
