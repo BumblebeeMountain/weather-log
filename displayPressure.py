@@ -15,7 +15,7 @@ MIN_TIME = int(time.time()) - TIME_AGO
 global HEIGHT
 HEIGHT = 191
 
-def getData(dbSecret="secrets/gcPi.secret", MIN_TIME=0):
+def getData(dbSecret="secrets/db.secret", MIN_TIME=0):
     s = db.getDbSecrets(dbSecret)
 
     CMD = """

@@ -41,7 +41,7 @@ def main():
     try:
         apiKey = wth.getApiKey("/home/pi/weather-log/secrets/apiKey.secret")
         loc = wth.getLocation("/home/pi/weather-log/secrets/location.secret")
-        dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db.secret")
+        dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db-pi.secret")
 
         con = db.createConnection(dbSecrets["hostname"], dbSecrets["username"], dbSecrets["dbname"], dbSecrets["password"]) # createConnection(hostName, userName, dbName, password):
 
