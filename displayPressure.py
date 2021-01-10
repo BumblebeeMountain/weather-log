@@ -15,8 +15,8 @@ MIN_TIME = int(time.time()) - TIME_AGO
 global HEIGHT
 HEIGHT = 191
 
-def getData(MIN_TIME=0):
-    s = db.getDbSecrets()
+def getData(dbSecret="secrets/gcPi.secret", MIN_TIME=0):
+    s = db.getDbSecrets(dbSecret)
 
     CMD = """
         SELECT * FROM measure WHERE time >= {};
@@ -25,8 +25,12 @@ def getData(MIN_TIME=0):
     user = s["username"]
     passwd = s["password"]
     dbname = s["dbname"]
+    ca = s["ca"]
+    cert = s["cert"]
+    key = s["key"]
 
-    con = db.createConnection(host, user, dbname, passwd)
+    con = db.createConnectionSSL(host, dbname, user, passwd, ca, cert, key)
+
     data = db.executeQuery(con, CMD)
     con.close()
 
@@ -34,7 +38,7 @@ def getData(MIN_TIME=0):
 
 def main(MIN_TIME):
 
-    data = getData(MIN_TIME)
+    data = getData(MIN_TIME=MIN_TIME)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, label="pressure")

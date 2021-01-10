@@ -3,3 +3,5 @@ location.secret
 *.secret
 plot.png
 __pycache__
+secrets
+*.pem

@@ -30,6 +30,23 @@ def createConnection(hostName, userName, dbName, password):
 
     return connection
 
+def createConnectionSSL(hostName, dbName, username, password, ssl_ca, ssl_cert, ssl_key):
+    con = None
+    try:
+        con = mysql.connector.connect(
+                host=hostName,
+                database=dbName,
+                user=username,
+                passwd=password,
+                ssl_ca = ssl_ca,
+                ssl_cert=ssl_cert,
+                ssl_key=ssl_key
+                )
+    except Error as err:
+        raise err
+
+    return con
+
 def executeUpdate(connection, update):
     cursor = connection.cursor()
     try:
@@ -48,7 +65,7 @@ def executeQuery(connection, q):
     except Error as e:
         raise e
 
-def getDbSecrets(fileName="db.secret"):
+def getDbSecrets(fileName="secrets/db.secret"):
     try:
         secrets = {}
         f = open(fileName)

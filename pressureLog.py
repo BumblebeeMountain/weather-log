@@ -38,9 +38,9 @@ def takeRecord(apiKey, loc, con):
 
 def main():
     try:
-        apiKey = wth.getApiKey("/home/pi/weather-log/apiKey.secret")
-        loc = wth.getLocation("/home/pi/weather-log/location.secret")
-        dbSecrets = db.getDbSecrets("/home/pi/weather-log/db.secret")
+        apiKey = wth.getApiKey("/home/pi/weather-log/secrets/apiKey.secret")
+        loc = wth.getLocation("/home/pi/weather-log/secrets/location.secret")
+        dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db.secret")
         con = db.createConnection(dbSecrets["hostname"], dbSecrets["username"], dbSecrets["dbname"], dbSecrets["password"]) # createConnection(hostName, userName, dbName, password):
 
         takeRecord(apiKey, loc, con)
