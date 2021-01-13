@@ -6,8 +6,10 @@ import numpy as np
 import math
 import datetime
 import time
+import sys
 
-NUM_OF_HOURS = 48
+global NUM_OF_HOURS
+NUM_OF_HOURS = 24
 
 TIME_AGO = NUM_OF_HOURS * 60 * 60
 MIN_TIME = int(time.time()) - TIME_AGO
@@ -15,7 +17,7 @@ MIN_TIME = int(time.time()) - TIME_AGO
 global HEIGHT
 HEIGHT = 191
 
-def getData(dbSecret="secrets/db.secret", MIN_TIME=0):
+def getData(dbSecret, MIN_TIME=0):
     s = db.getDbSecrets(dbSecret)
 
     CMD = """
@@ -25,9 +27,9 @@ def getData(dbSecret="secrets/db.secret", MIN_TIME=0):
     user = s["username"]
     passwd = s["password"]
     dbname = s["dbname"]
-    ca = s["ca"]
-    cert = s["cert"]
-    key = s["key"]
+    ca = PATH + s["ca"]
+    cert = PATH + s["cert"]
+    key = PATH + s["key"]
 
     con = db.createConnectionSSL(host, dbname, user, passwd, ca, cert, key)
 
@@ -38,11 +40,16 @@ def getData(dbSecret="secrets/db.secret", MIN_TIME=0):
 
 def main(MIN_TIME):
 
-    data = getData(MIN_TIME=MIN_TIME)
+    global PATH
+    PATH = "".join([route + "/" for route in sys.argv[0].split("/")[:-1]])
+
+    data = getData(PATH+"secrets/db.secret", MIN_TIME=MIN_TIME)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111, label="pressure")
     ax2 = fig.add_subplot(111, label="trend", frame_on=False)
+
+    fig.suptitle("Change in pressure for the past {} hrs".format(NUM_OF_HOURS))
 
     y = data[:, 1]
     seaPressure = [
@@ -79,7 +86,7 @@ def main(MIN_TIME):
 
     print("Latest reading: {} : {}".format(convert(float(data[-1, 0])), data[-1, 1]))
 
-    plt.savefig("plot.png")
+    plt.savefig(PATH + "plot.png")
     plt.show()
 
 def convert(epoch):

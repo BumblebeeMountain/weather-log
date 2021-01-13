@@ -7,6 +7,7 @@ import databaseController as db
 import numpy as np
 import time
 import datetime
+import sys
 
 sense = SenseHat()
 global MAX_TRY
@@ -38,18 +39,19 @@ def takeRecord(apiKey, loc, con):
 
 def main():
     con = None
+    path = "".join([route + "/" for route in sys.argv[0].split("/")[:-1]])
     try:
-        apiKey = wth.getApiKey("/home/pi/weather-log/secrets/apiKey.secret")
-        loc = wth.getLocation("/home/pi/weather-log/secrets/location.secret")
-        dbSecrets = db.getDbSecrets("/home/pi/weather-log/secrets/db-pi.secret")
+        apiKey = wth.getApiKey(path+"secrets/apiKey.secret")
+        loc = wth.getLocation(path+"secrets/location.secret")
+        dbSecrets = db.getDbSecrets(path+"secrets/db-pi.secret")
 
         host = dbSecrets["hostname"]
         user = dbSecrets["username"]
         passwd = dbSecrets["password"]
         dbname = dbSecrets["dbname"]
-        ca = dbSecrets["ca"]
-        cert = dbSecrets["cert"]
-        key = dbSecrets["key"]
+        ca = path + dbSecrets["ca"]
+        cert = path + dbSecrets["cert"]
+        key = path + dbSecrets["key"]
 
         con = db.createConnectionSSL(host, dbname, user, passwd, ca, cert, key)
 
